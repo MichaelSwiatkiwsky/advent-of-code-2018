@@ -6,8 +6,11 @@ import java.util.List;
 public class Main {
 
     public static void main(String[] args) throws IOException {
+        System.out.println("Challenge 1A solution: " + solveChallenge1A("input/input1A.txt"));
+    }
 
-        List<String> lines = Files.readAllLines(Paths.get("input/input1A.txt"));
+    public static int solveChallenge1A(String inputFileName) throws IOException {
+        List<String> lines = Files.readAllLines(Paths.get(inputFileName));
 
         int sum = 0;
 
@@ -15,6 +18,6 @@ public class Main {
             sum += Integer.parseInt(line);
         }
 
-        System.out.println(sum);
+        return sum;
     }
 }
