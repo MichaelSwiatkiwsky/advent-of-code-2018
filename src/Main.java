@@ -87,9 +87,16 @@ public class Main {
 
                 String similarChars = "";
 
+                int mismatchCount = 0;
                 for (int a = 0; a < strA.length(); a++) {
                     if (strA.charAt(a) == strB.charAt(a)) {
                         similarChars += strA.charAt(a);
+                    }
+                    else {
+                        mismatchCount++;
+                        if (mismatchCount > 1) {
+                            break; // No need to check rest of string if already impossible to satisfy conditions
+                        }
                     }
                 }
                 if (similarChars.length() == ID_SIZE - 1) {
