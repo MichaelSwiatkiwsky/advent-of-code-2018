@@ -4,6 +4,7 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 public class Main {
     public static void main(String[] args) throws IOException {
@@ -13,6 +14,8 @@ public class Main {
         System.out.println("Challenge 2B solution: " + solveChallenge2B("input/input2A.txt"));
         System.out.println("Challenge 3A solution: " + solveChallenge3A("input/input3A.txt"));
         System.out.println("Challenge 3B solution: " + solveChallenge3B("input/input3A.txt"));
+        System.out.println("Challenge 4A solution: " + solveChallenge4A("input/input4A.txt"));
+        System.out.println("Challenge 4B solution: " + solveChallenge4B("input/input4A.txt"));
     }
 
     public static int solveChallenge1A(String inputFileName) throws IOException {
@@ -218,6 +221,126 @@ public class Main {
 
         // Should never reach here if input valid
         return -1;
+    }
+
+    public static int solveChallenge4A(String inputFileName) throws IOException {
+        List<String> lines = Files.readAllLines(Paths.get(inputFileName));
+
+        Map<String, String> data = new TreeMap<>();
+
+        for (String line : lines) {
+            String timestamp = line.substring(1,line.indexOf(']'));
+            String action = line.substring(line.indexOf(']') + 2);
+            data.put(timestamp, action);
+        }
+
+        Map<Integer, int[]> sleepTime = new HashMap<>();
+
+        int currentGuardId = 0;
+        int minuteAsleep = 0;
+        int minuteAwake = 0;
+
+        for (Map.Entry<String,String> entry : data.entrySet()) {
+            if (entry.getValue().equals("falls asleep")) {
+                //Sleep
+                minuteAsleep = Integer.parseInt(entry.getKey().split(" ")[1].split(":")[1]);
+            }
+            else if (entry.getValue().equals("wakes up")) {
+                //Awake
+                minuteAwake = Integer.parseInt(entry.getKey().split(" ")[1].split(":")[1]);
+                for (int i = minuteAsleep; i < minuteAwake; i++) {
+                    if (sleepTime.get(currentGuardId) == null) {
+                        // 61 because we use the last index for total minutes
+                        sleepTime.put(currentGuardId, new int[61]);
+                    }
+                    sleepTime.get(currentGuardId)[i]++;
+
+                    // Keep track of total minute slept to avoid summing later
+                    sleepTime.get(currentGuardId)[60]++;
+                }
+            }
+            else {
+                currentGuardId = Integer.parseInt(entry.getValue().split(" ")[1].substring(1));
+            }
+        }
+
+        int mostSleepyGuardId = 0;
+        int mostSleep = 0;
+        for (Map.Entry<Integer, int[]> entry : sleepTime.entrySet()) {
+            if (entry.getValue()[60] > mostSleep) {
+                mostSleep = entry.getValue()[60];
+                mostSleepyGuardId = entry.getKey();
+            }
+        }
+
+        int mostCommonMinute = 0;
+        int mostSleepInAMinute = 0;
+        for (int i = 0; i < 60; i++) {
+            if (sleepTime.get(mostSleepyGuardId)[i] > mostSleepInAMinute) {
+                mostSleepInAMinute = sleepTime.get(mostSleepyGuardId)[i];
+                mostCommonMinute = i;
+            }
+        }
+
+        return mostSleepyGuardId * mostCommonMinute;
+    }
+
+    public static int solveChallenge4B(String inputFileName) throws IOException {
+        List<String> lines = Files.readAllLines(Paths.get(inputFileName));
+
+        Map<String, String> data = new TreeMap<>();
+
+        for (String line : lines) {
+            String timestamp = line.substring(1,line.indexOf(']'));
+            String action = line.substring(line.indexOf(']') + 2);
+            data.put(timestamp, action);
+        }
+
+        Map<Integer, int[]> sleepTime = new HashMap<>();
+
+        int currentGuardId = 0;
+        int minuteAsleep = 0;
+        int minuteAwake = 0;
+
+        for (Map.Entry<String,String> entry : data.entrySet()) {
+            if (entry.getValue().equals("falls asleep")) {
+                //Sleep
+                minuteAsleep = Integer.parseInt(entry.getKey().split(" ")[1].split(":")[1]);
+            }
+            else if (entry.getValue().equals("wakes up")) {
+                //Awake
+                minuteAwake = Integer.parseInt(entry.getKey().split(" ")[1].split(":")[1]);
+                for (int i = minuteAsleep; i < minuteAwake; i++) {
+                    if (sleepTime.get(currentGuardId) == null) {
+                        // 61 because we use the last index for total minutes
+                        sleepTime.put(currentGuardId, new int[61]);
+                    }
+                    sleepTime.get(currentGuardId)[i]++;
+
+                    // Keep track of total minute slept to avoid summing later
+                    sleepTime.get(currentGuardId)[60]++;
+                }
+            }
+            else {
+                currentGuardId = Integer.parseInt(entry.getValue().split(" ")[1].substring(1));
+            }
+        }
+
+        int mostSleepyGuardId = 0;
+        int mostSleepInAMinute = 0;
+        int mostSleepyMinute = 0;
+        for (Map.Entry<Integer, int[]> entry : sleepTime.entrySet()) {
+            int id = entry.getKey();
+            for (int i = 0; i < 60; i++) {
+                if (entry.getValue()[i] > mostSleepInAMinute) {
+                    mostSleepInAMinute = entry.getValue()[i];
+                    mostSleepyGuardId = id;
+                    mostSleepyMinute = i;
+                }
+            }
+        }
+
+        return mostSleepyGuardId * mostSleepyMinute;
     }
 }
 
